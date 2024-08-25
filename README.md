@@ -32,6 +32,6 @@ docker compose ps
    ```
 5. Speech from text to another language
    ```
-   http://192.168.0.121:3000/t_lan?text=selamat_malam&frm_lan=ms&to_lan=en
+   curl http://192.168.0.121:3000/t_lan?text=selamat_malam&frm_lan=ms&to_lan=en
    ```
    
