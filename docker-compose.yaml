@@ -3,15 +3,16 @@ version: '3.8'
 services:
   sound_player:
     build: .
+    restart: always
     container_name: player
     devices:
       - "/dev/snd:/dev/snd"
     group_add:
       - "audio"
     volumes:
-        - /etc/localtime:/etc/localtime:ro
-        - /etc/timezone:/etc/timezone:ro
-        - ./resources:/app/resources
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - ./resources:/app/resources
     environment:
       - DISPLAY
     ports:

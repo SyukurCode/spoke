@@ -6,6 +6,7 @@ from gtts import gTTS
 import logging
 import os
 import json
+import threading
 
 # LOCAL LIBRARY
 import player
@@ -14,6 +15,8 @@ import textToSound
 #DEFINE TRASLATOR
 translator = Translator()
 
+#DEFINE PLAYER
+_player = player.VLCPlayer()
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -32,11 +35,24 @@ def play():
 		return jsonify({"Error":"Missing parameter"}), 400
 	#soundFile = "/opt/AlexaPi/src/resources/ok.mp3"
 	if os.path.exists(soundFile):
-		_player = player.VLCPlayer(soundFile)
-		_player.play()
-		return jsonify({"message":"Played"}), 200
+		if _player.get_status() == "Playing":
+			return jsonify({"message":"Player in use"}), 400
+		task = threading.Thread(target=_player.play,args=(soundFile,))
+		task.start()
+		_player.play(soundFile)
+		return jsonify({"message":"Playing"}), 200
 
-	return jsonify({"message":"file not found"}), 204
+	return jsonify({"message":"file not found"}), 400
+
+@app.route('/status')
+def playerState():
+	status = _player.get_status()
+	return jsonify({"status":status}), 200
+
+@app.route('/stop')
+def playerStop():
+	_player.stop()
+	return jsonify({"status":"stopped"}), 200
 
 @app.route("/speech")
 def speech():
@@ -54,8 +70,7 @@ def speech():
 
 	speechOut = textToSound.text(textForSpeech,lan)
 	soundSpeech = json.loads(speechOut.speech())
-	_player = player.VLCPlayer(soundSpeech["file"])
-	_player.play()
+	_player.play(soundSpeech["file"])
 	return jsonify({"message":"Spoken","language":soundSpeech["language"]}), 200
 
 @app.route('/t_lan', methods=["GET"])
@@ -75,8 +90,7 @@ def speechtolan():
 
 	speechOut = textToSound.text(textForSpeech,lan)
 	soundSpeech = json.loads(speechOut.speechToLan(to_lan))
-	_player = player.VLCPlayer(soundSpeech["file"])
-	_player.play()
+	_player.play(soundSpeech["file"])
 	return jsonify({"message":"Spoken","from":soundSpeech["language"],"to":soundSpeech["to_lan"]}), 200
 
 @app.errorhandler(404)

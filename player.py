@@ -2,18 +2,14 @@ import vlc
 import time
 import logging
 
-soundFile = "/opt/AlexaPi/src/resources/ok.mp3"
-
-import logging
-
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 class VLCPlayer:
-	def __init__(self, audio_file):
-		self.audio_file = audio_file
-		self.player = vlc.MediaPlayer(audio_file)
-		logger.debug(audio_file)
+	def __init__(self):
+		self._thread = None
+		self.player = vlc.MediaPlayer()
+		logger.debug("player set")
 
 	def stop(self):
 		self.player.stop()
@@ -32,7 +28,9 @@ class VLCPlayer:
 			}
 		return states.get(state, "Unknown")
 
-	def play(self):
+	def play(self,audio_file):
+		media = vlc.Media(audio_file)
+		self.player.set_media(media)
 		self.player.play()
 		# Allow some time for VLC to start
 		time.sleep(1)
