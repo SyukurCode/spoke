@@ -1,0 +1,7 @@
+# This is just a comment.
+README.md
+env
+.git
+app.log
+docker-compose.yaml
+Dockerfile
