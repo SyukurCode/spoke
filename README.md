@@ -34,4 +34,12 @@ docker compose ps
    ```
    curl http://192.168.0.121:3000/t_lan?text=selamat_malam&frm_lan=ms&to_lan=en
    ```
+6. Get status player
+   ```
+   curl http://192.168.0.121:3000/status
+   ```
+7. Stop player
+   ```
+   curl http://192.168.0.121:3000/stop
+   ```
    
