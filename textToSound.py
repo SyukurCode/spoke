@@ -1,7 +1,9 @@
 from googletrans import Translator
 from gtts import gTTS
+from datetime import datetime
 import json
 import logging
+import googletrans
 
 logging.basicConfig(level=logging.info)
 logger = logging.getLogger(__name__)
@@ -24,10 +26,11 @@ class text:
 
 		logger.info("lang:{}".format(lang_set))
 		speechAudio = gTTS(self._text, lang=lang_set, slow=False)
-		speechAudio.save("./resources/speech.mp3")
+		filename = f"./tmp/{datetime.now().timestamp()}.mp3"
+		speechAudio.save(filename)
 
 		output = {
-			  "file":"./resources/speech.mp3",
+			  "file": filename,
 			  "language": lang_set
 			 }
 
@@ -42,10 +45,11 @@ class text:
 			lang_set = self._language
 
 		speechAudio = gTTS(self._text, lang=lang, slow=False)
-		speechAudio.save("./resources/speech.mp3")
+		filename = f"./tmp/{datetime.now().timestamp()}.mp3"
+		speechAudio.save(filename)
 
 		output = {
-                          "file":"./resources/speech.mp3",
+                          "file": filename,
                           "language": lang_set,
 			  "to_lan":lang
                          }

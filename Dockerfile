@@ -18,4 +18,7 @@ RUN pip3 install -r requirements.txt
 
 COPY . .
 
+RUN mkdir tmp && chmod 777 -R tmp
+
 CMD [ "python3", "index.py"]
+#CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:3000", "index:app"]
