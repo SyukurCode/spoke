@@ -123,6 +123,10 @@ def speechtolan():
 	to_lang = sourcelang[soundSpeech["to_lan"]]
 	return jsonify({"message":"Spoken","from":from_lang,"to":to_lang}), 200
 
+@app.route("/playlist", methods=["GET"])
+def playlist():
+	return _player.get_playlist()
+
 @app.errorhandler(404)
 def error404_request(error):
     return jsonify({'message':str(error)}), 404

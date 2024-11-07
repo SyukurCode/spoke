@@ -1,4 +1,4 @@
-import vlc
+import vlc, json
 import time
 import logging
 import threading
@@ -67,4 +67,12 @@ class VLCPlayer:
 				vlc.State.Error: "Error"
 			}
 		return states.get(state, "Unknown")
-
+	
+	def get_playlist(self):
+		i = 0
+		playlist = []
+		for l in self.playlist:
+			playlist.append(f"{i}-{l}")
+			i = i + 1
+		output = {"current_play": self.current_index,"playlist": playlist}
+		return json.dumps(output)
