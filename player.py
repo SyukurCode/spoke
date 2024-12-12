@@ -54,6 +54,12 @@ class VLCPlayer:
 	def stop(self):
 		self.player.stop()
 
+	def pause(self):
+		self.player.pause()
+
+	def play(self):
+		self.player.play()
+
 	def get_status(self):
 		state = self.player.get_state()
 		states = {

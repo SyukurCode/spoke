@@ -50,12 +50,12 @@ def play():
 		if priority is None or not priority:
 			_player.add_to_playlist(soundFile)
 		else:
-			_primary_player.play_media(soundFile)
-			_player.set_volume(30)
-			_primary_player.wait_until_playing()
-			_primary_player.wait_until_finished()
-			_player.set_volume(100)
-			
+			if _player.get_status() == "Playing":
+				_player.pause()
+			_primary_player.add_to_playlist(soundFile)
+			if _player.get_status() == "Paused":
+				_player.play()
+
 		if _player.get_status() == "Playing":
 			return jsonify({"message":f"Add to playlist:{soundFile}"}), 200
 		return jsonify({"message":"Playing"}), 200
@@ -113,11 +113,10 @@ def speech():
 		_player.add_to_playlist(soundSpeech["file"])
 	else:
 		if _player.get_status() == "Playing":
-			_player.set_volume(30)
-		_primary_player.play_media(soundSpeech["file"])
-		_primary_player.wait_until_playing()
-		_primary_player.wait_until_finished()
-		_player.set_volume(100)
+			_player.pause()
+		_primary_player.add_to_playlist(soundSpeech["file"])
+		if _player.get_status() == "Paused":
+			_player.play()
 
 	return jsonify({"message":"Spoken","language":soundSpeech["language"]}), 200
 
