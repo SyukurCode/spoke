@@ -18,6 +18,7 @@ translator = Translator()
 
 #DEFINE PLAYER
 _player = player.VLCPlayer()
+_primary_player = player.VLCPlayer()
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -36,6 +37,7 @@ def languages():
 @app.route('/play', methods=["GET"])
 def play():
 	soundFile = request.args.get('file')
+	priority = request.args.get('priority')
 	if soundFile is None or not soundFile:
 		logger.debug("missing parameter")
 		return jsonify({"Error":"Missing parameter"}), 400
@@ -45,7 +47,15 @@ def play():
 #	logger.info(f"{audio_file_name}")
 
 	if os.path.exists(soundFile):
-		_player.add_to_playlist(soundFile)
+		if priority is None or not priority:
+			_player.add_to_playlist(soundFile)
+		else:
+			_primary_player.play_media(soundFile)
+			_player.set_volume(30)
+			_primary_player.wait_until_playing()
+			_primary_player.wait_until_finished()
+			_player.set_volume(100)
+			
 		if _player.get_status() == "Playing":
 			return jsonify({"message":f"Add to playlist:{soundFile}"}), 200
 		return jsonify({"message":"Playing"}), 200
@@ -85,6 +95,7 @@ def playerStop():
 def speech():
 	textForSpeech = request.args.get('text')
 	lan = request.args.get('lan')
+	priority = request.args.get('priority')
 	#textForSpeech = "Selamat pagi"
 	if textForSpeech is None or not textForSpeech:
 		logger.debug("missing parameter")
@@ -97,7 +108,17 @@ def speech():
 
 	speechOut = textToSound.text(textForSpeech,lan)
 	soundSpeech = json.loads(speechOut.speech())
-	_player.add_to_playlist(soundSpeech["file"])
+
+	if priority is None or not priority:
+		_player.add_to_playlist(soundSpeech["file"])
+	else:
+		if _player.get_status() == "Playing":
+			_player.set_volume(30)
+		_primary_player.play_media(soundSpeech["file"])
+		_primary_player.wait_until_playing()
+		_primary_player.wait_until_finished()
+		_player.set_volume(100)
+
 	return jsonify({"message":"Spoken","language":soundSpeech["language"]}), 200
 
 @app.route('/t_lan', methods=["GET"])
@@ -125,7 +146,8 @@ def speechtolan():
 
 @app.route("/playlist", methods=["GET"])
 def playlist():
-	return _player.get_playlist()
+	data = json.loads(_player.get_playlist())
+	return jsonify(data), 200
 
 @app.errorhandler(404)
 def error404_request(error):

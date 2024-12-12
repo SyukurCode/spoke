@@ -68,6 +68,13 @@ class VLCPlayer:
 			}
 		return states.get(state, "Unknown")
 	
+	def set_volume(self,volume):
+		self.player.audio_set_volume(volume)
+	
+	def get_volume(self):
+		value = self.player.audio_get_volume()
+		return value
+
 	def get_playlist(self):
 		i = 0
 		playlist = []
