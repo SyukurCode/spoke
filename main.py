@@ -39,23 +39,23 @@ def languages():
 	return sourcelang
 
 @app.get("/play")
-def play(soundFile: str,priority: bool = False):
-    if soundFile is None or not soundFile:
+def play(file: str,priority: bool = False):
+    if file is None or not file:
         logger.debug("missing parameter")
         raise HTTPException(status_code=400, detail="Missing parameter")
 
-    if os.path.exists(soundFile):
+    if os.path.exists(file):
         if priority is None or not priority:
-            _player.add_to_playlist(soundFile)
+            _player.add_to_playlist(file)
         else:
             if _player.get_status() == "Playing":
                 _player.pause()
-            _primary_player.add_to_playlist(soundFile)
+            _primary_player.add_to_playlist(file)
             if _player.get_status() == "Paused":
                 _player.play()
 
         if _player.get_status() == "Playing":
-            return {"message":f"Add to playlist:{soundFile}"}
+            return {"message":f"Add to playlist:{file}"}
         return {"message":"Playing"}
     
     raise HTTPException(status_code=400, detail="file not found")
@@ -84,18 +84,18 @@ def player_stop():
 	return {"status":"stopped"}
 
 @app.get("/speech")
-def speech(textForSpeech: str, lan: str, priority: bool = False):
-	#textForSpeech = "Selamat pagi"
-	if textForSpeech is None or not textForSpeech:
+def speech(text: str, lan: str = "ms", priority: bool = False):
+	#text = "Selamat pagi"
+	if text is None or not text:
 		logger.debug("missing parameter")
 		raise HTTPException(status_code=400, detail="Missing parameter")
 
 	if lan is None or not lan:
-		speechOut = textToSound.text(textForSpeech,"auto")
+		speechOut = textToSound.text(text,"auto")
 	else:
-		speechOut = textToSound.text(textForSpeech,lan)
+		speechOut = textToSound.text(text,lan)
 
-	speechOut = textToSound.text(textForSpeech,lan)
+	speechOut = textToSound.text(text,lan)
 	soundSpeech = json.loads(speechOut.speech())
 
 	if priority is None or not priority:
@@ -110,17 +110,17 @@ def speech(textForSpeech: str, lan: str, priority: bool = False):
 	return {"message":"Spoken","language":soundSpeech["language"]}
 
 @app.get('/t_lan')
-def speechtolan(textForSpeech: str, lan: str, to_lan: str):
-	if textForSpeech is None or not textForSpeech or to_lan is None or not to_lan:
+def speechtolan(text: str, lan: str, to_lan: str):
+	if text is None or not text or to_lan is None or not to_lan:
 		logger.debug("missing parameter")
 		raise HTTPException(status_code=400, detail="Missing parameter")
 
 	if lan is None or not lan:
-		speechOut = textToSound.text(textForSpeech,"auto")
+		speechOut = textToSound.text(text,"auto")
 	else:
-		speechOut = textToSound.text(textForSpeech,lan)
+		speechOut = textToSound.text(text,lan)
 
-	speechOut = textToSound.text(textForSpeech,lan)
+	speechOut = textToSound.text(text,lan)
 	soundSpeech = json.loads(speechOut.speechToLan(to_lan))
 	_player.add_to_playlist(soundSpeech["file"])
 	sourcelang = googletrans.LANGUAGES
