@@ -20,5 +20,6 @@ COPY . .
 
 RUN mkdir tmp && chmod 777 -R tmp
 
-CMD [ "python3", "index.py"]
-#CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:3000", "index:app"]
+#CMD [ "python3", "index.py"]
+#CMD ["gunicorn", "-w", "1", "-b", "0.0.0.0:3000", "main:app"]
+CMD ["uvicorn","main:app","--host","0.0.0.0","--port","3000"]

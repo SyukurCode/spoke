@@ -5,3 +5,5 @@ env
 app.log
 docker-compose.yaml
 Dockerfile
+buildpush.sh
+index.py
