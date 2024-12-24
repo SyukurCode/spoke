@@ -19,7 +19,7 @@ RUN pip3 install -r requirements.txt
 COPY . .
 
 RUN mkdir tmp && chmod 777 -R tmp
-
+RUN mkdir log && chmod 777 -R log
 #CMD [ "python3", "index.py"]
 #CMD ["gunicorn", "-w", "1", "-b", "0.0.0.0:3000", "main:app"]
 CMD ["uvicorn","main:app","--host","0.0.0.0","--port","3000"]

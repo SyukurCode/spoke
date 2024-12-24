@@ -3,7 +3,7 @@ import time
 import logging
 import threading
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO,filename='/app/log/logs.log',filemode='a',datefmt='%d-%m-%Y %H:%M:%S',format='%(asctime)s %(module)s %(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
 
 class VLCPlayer:
