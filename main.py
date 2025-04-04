@@ -83,13 +83,19 @@ def player_State(request: Request):
 	time = _player.get_time()
 	length = _player.get_length()
 	file_req = json.loads(_player.get_playlist())
-	file = file_req["playlist"][_player.current_index]
+	if len(file_req["playlist"]) == 0:
+		file = "No file"
+	else:
+		file = file_req["playlist"][_player.current_index]
 	
 	primary_status = _primary_player.get_status()
 	primary_time = _primary_player.get_time()
 	primary_length = _primary_player.get_length()
 	primary_file_req = json.loads(_primary_player.get_playlist())
-	primary_file = primary_file_req["playlist"][_primary_player.current_index]
+	if len(primary_file_req["playlist"]) == 0:
+		primary_file = "No file"
+	else:
+		primary_file = primary_file_req["playlist"][_primary_player.current_index]
 
 	logger.info(f"Request from {request.client.host}")
 	return {"Player":{"status":status,"time": time,"length": length,"file":file},
