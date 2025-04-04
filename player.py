@@ -79,7 +79,9 @@ class VLCPlayer:
 		return time
 	
 	def get_length(self):
+		time.sleep(1)
 		length = self.player.get_length()
+		return length
 	
 	def set_volume(self,volume):
 		self.player.audio_set_volume(volume)

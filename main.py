@@ -82,12 +82,18 @@ def player_State(request: Request):
 	status = _player.get_status()
 	time = _player.get_time()
 	length = _player.get_length()
+	file_req = _player.get_playlist().json()
+	file = file_req["playlist"][_player.current_index]
+	
 	primary_status = _primary_player.get_status()
 	primary_time = _primary_player.get_time()
 	primary_length = _primary_player.get_length()
+	primary_file_req = _primary_player.get_playlist().json()
+	primary_file = primary_file_req["playlist"][_primary_player.current_index]
+
 	logger.info(f"Request from {request.client.host}")
-	return {"Player":{"status":status,"time": time,"lenhth": length},
-		  "Primary_player":{"status": primary_status,"time": primary_time,"length": primary_length}}
+	return {"Player":{"status":status,"time": time,"length": length,"file":file},
+		  "Primary_player":{"status": primary_status,"time": primary_time,"length": primary_length,"file":primary_file}}
 
 @app.get('/stop')
 def player_stop(request: Request,isPrimary: bool = False):
