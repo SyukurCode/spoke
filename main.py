@@ -80,9 +80,14 @@ def get_audio_files(request: Request):
 @app.get('/status')
 def player_State(request: Request):
 	status = _player.get_status()
+	time = _player.get_time()
+	length = _player.get_length()
 	primary_status = _primary_player.get_status()
+	primary_time = _primary_player.get_time()
+	primary_length = _primary_player.get_length()
 	logger.info(f"Request from {request.client.host}")
-	return {"Player":status, "Primary_player":primary_status}
+	return {"Player":{"status":status,"time": time,"lenhth": length},
+		  "Primary_player":{"status": primary_status,"time": primary_time,"length": primary_length}}
 
 @app.get('/stop')
 def player_stop(request: Request,isPrimary: bool = False):
