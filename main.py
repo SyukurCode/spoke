@@ -86,7 +86,10 @@ def player_State(request: Request):
 	if len(file_req["playlist"]) == 0:
 		file = "No file"
 	else:
-		file = file_req["playlist"][_player.current_index]
+		try:
+			file = file_req["playlist"][_player.current_index]
+		except:
+			file = "No file"
 	
 	primary_status = _primary_player.get_status()
 	primary_time = _primary_player.get_time()
@@ -95,7 +98,10 @@ def player_State(request: Request):
 	if len(primary_file_req["playlist"]) == 0:
 		primary_file = "No file"
 	else:
-		primary_file = primary_file_req["playlist"][_primary_player.current_index]
+		try:
+			primary_file = primary_file_req["playlist"][_primary_player.current_index]
+		except:
+			primary_file = "No file"
 
 	logger.info(f"Request from {request.client.host}")
 	return {"Player":{"status":status,"time": time,"length": length,"file":file},

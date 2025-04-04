@@ -29,7 +29,7 @@ apscheduler
 fastapi==0.115.0
 uvicorn==0.30.6
 #python-multipart==0.0.12
-gunicorn==23.0.0
+#gunicorn==23.0.0
 #annotated-types==0.7.0
 #pydantic==2.9.2
 #pydantic-core==2.23.4
