@@ -46,7 +46,7 @@ class VLCPlayer:
 		logger.info(f"Playlist:[{self.playlist}]")
 
 	def next_media(self):
-		if self.current_index < len(self.playlist):
+		if self.current_index < (len(self.playlist) - 1) :
 			self.current_index += 1
 			self.play_media(self.playlist[self.current_index])
 
