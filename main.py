@@ -17,6 +17,9 @@ translator = Translator()
 _player = player.VLCPlayer()
 _primary_player = player.VLCPlayer()
 
+#DEFINE CRON
+_cron = cron.cron_job()
+
 logging.basicConfig(level=logging.INFO,filename='/app/log/logs.log',filemode='a',datefmt='%d-%m-%Y %H:%M:%S',format='%(asctime)s %(module)s %(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
 
@@ -28,6 +31,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.on_event("startup")
+async def startup_function():
+	_cron.execute_cleaning()
+	logger.info("Server is starting up...")
 
 @app.get("/", tags=["Test"])
 def index(request: Request):
@@ -50,12 +58,13 @@ def play( request: Request ,file: str, priority: bool = False):
 	if os.path.exists(file):
 		if priority is None or not priority:
 			_player.add_to_playlist(file)
+			if _primary_player.get_status == "Playing":
+				_player.pause()
+				_cron.execute_monitor()
 		else:
 			if _player.get_status() == "Playing":
 				_player.pause()
-			_primary_player.add_to_playlist(file)
-			if _player.get_status() == "Paused":
-				_player.play()
+				_cron.execute_monitor()
 				
 		if _player.get_status() == "Playing":
 			return {"message":f"Add to playlist:{file}"}
@@ -133,12 +142,14 @@ def speech(request: Request, text: str, lan: str = "ms", priority: bool = False)
 
 	if priority is None or not priority:
 		_player.add_to_playlist(soundSpeech["file"])
+		if _primary_player.get_status == "Playing":
+			_player.pause()
+			_cron.execute_monitor()
 	else:
 		if _player.get_status() == "Playing":
 			_player.pause()
+			_cron.execute_monitor()
 		_primary_player.add_to_playlist(soundSpeech["file"])
-		if _player.get_status() == "Paused":
-			_player.play()
  
 	logger.info(f"Request from {request.client.host}")
 	return {"message":"Spoken","language":soundSpeech["language"]}
@@ -171,3 +182,29 @@ def playlist(request: Request, isPrimary: bool = False):
 		data = json.loads(_primary_player.get_playlist())
 	logger.info(f"Request from {request.client.host}")
 	return data
+
+@app.get("/pause")
+def player_pause(request: Request, isPrimary: bool = False):
+	if isPrimary is None or not isPrimary:
+		_player.pause()
+		logger.info(f"Request from {request.client.host}")
+		return {"status":"stopped"}
+	else:
+		_primary_player.pause()
+		logger.info(f"Request from {request.client.host}")
+		return {"status":"stopped"}
+	
+@app.get("/continue")
+def player_continue(request: Request, isPrimary: bool = False):
+	logger.info(f"Request from {request.client.host}")
+	if isPrimary is None or not isPrimary:
+		if _player.get_status == "Paused":
+			_player.play()
+			return {"status":"continue"}
+		return {"status": _player.get_status()}
+	else:
+		if _primary_player.get_status == "Paused":
+			_primary_player.play()
+			return {"status":"continue"}
+		return {"status": _primary_player.get_status()}
+		

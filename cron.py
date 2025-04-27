@@ -1,6 +1,6 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 import os, glob, logging, time
-import zoneinfo
+import zoneinfo, player, requests
 
 os.environ['TZ'] = 'Asia/Kuala_Lumpur'
 zoneinfo.ZoneInfo('Asia/Kuala_Lumpur')
@@ -8,6 +8,36 @@ zoneinfo.ZoneInfo('Asia/Kuala_Lumpur')
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+cleaner_scheduler = BackgroundScheduler()
+player_scheduler = BackgroundScheduler()
+
+class cron_job:
+	def __init__(self):
+		pass
+
+	def execute_cleaning(self):
+		cleaner_scheduler.add_job(run_cleaning, 'interval', minutes=10)
+		cleaner_scheduler.start()
+
+	def execute_monitor(self):
+		player_scheduler.add_job(player_monitor, 'interval', minutes=1)
+		player_scheduler.start()
+		
+def player_monitor():
+		response = requests.get("http://localhost:3000/status")
+		if(response.status_code == 200):
+			data = response.json()
+			if data["Primary_player"]["status"] == "Ended":
+				if data["Player"]["status"] == "Paused":
+					req = requests.get("http://localhost:3000/continue")
+					if player_scheduler.get_jobs() :
+						player_scheduler.shutdown()
+			
+		else:
+			if player_scheduler.get_jobs() :
+				player_scheduler.shutdown()
+				
 
 def run_cleaning():
 	folder_path = "./tmp"  # Specify the folder path
@@ -29,6 +59,4 @@ def isOld(file):
 		return True
 	return False
 
-scheduler = BackgroundScheduler()
-scheduler.add_job(run_cleaning, 'interval', minutes=10)
-scheduler.start()
+
