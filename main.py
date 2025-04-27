@@ -65,6 +65,7 @@ def play( request: Request ,file: str, priority: bool = False):
 			if _player.get_status() == "Playing":
 				_player.pause()
 				_cron.execute_monitor()
+			_primary_player.add_to_playlist(file)
 				
 		if _player.get_status() == "Playing":
 			return {"message":f"Add to playlist:{file}"}
