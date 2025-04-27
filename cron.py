@@ -17,12 +17,15 @@ class cron_job:
 		pass
 
 	def execute_cleaning(self):
+		logger.info("Cleaning Scheduler execute...")
 		cleaner_scheduler.add_job(run_cleaning, 'interval', minutes=10)
 		cleaner_scheduler.start()
 
 	def execute_monitor(self):
-		player_scheduler.add_job(player_monitor, 'interval', minutes=1)
-		player_scheduler.start()
+		if not player_scheduler.get_jobs():
+			logger.info("Monitoring Scheduler execute...")
+			player_scheduler.add_job(player_monitor, 'interval', minutes=1)
+			player_scheduler.start()
 		
 def player_monitor():
 		response = requests.get("http://localhost:3000/status")
@@ -31,12 +34,15 @@ def player_monitor():
 			if data["Primary_player"]["status"] == "Ended":
 				if data["Player"]["status"] == "Paused":
 					req = requests.get("http://localhost:3000/continue")
+					logger.info("Player continue")
 					if player_scheduler.get_jobs() :
 						player_scheduler.shutdown()
+						logger.info("Scheduler stoped")
 			
 		else:
 			if player_scheduler.get_jobs() :
 				player_scheduler.shutdown()
+				logger.info("Scheduler stoped")
 				
 
 def run_cleaning():
