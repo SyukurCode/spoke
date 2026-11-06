@@ -8,7 +8,10 @@ logger = logging.getLogger(__name__)
 
 class VLCPlayer:
 	def __init__(self):
-		self.instance = vlc.Instance()
+		self.instance = vlc.Instance(
+			"--aout=alsa",
+			"--alsa-audio-device=plughw:2,0"
+		)
 		self.player = self.instance.media_player_new()
 		self.playlist = []
 		self.current_index = 0
